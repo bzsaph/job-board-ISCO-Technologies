@@ -5,10 +5,10 @@ const { hashPass } = require('../utils/hash');
 
 async function seed() {
   const db = open();
-  const adminEmail = 'admin@jobboard.com';
-  const userEmail = 'user@jobboard.com';
-  const adminPass = 'admin123';
-  const userPass = 'user123';
+  const adminEmail = 'bazimyas@gmail.com';
+  const userEmail = 'saphanib@gmail.com';
+  const adminPass = 'bazimyas@gmail.com';
+  const userPass = 'bazimyas@gmail.com';
   const hAdmin = await hashPass(adminPass);
   const hUser = await hashPass(userPass);
 

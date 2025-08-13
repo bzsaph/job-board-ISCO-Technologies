@@ -7,6 +7,6 @@ migrate()
     app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
   })
   .catch((err) => {
-    console.error('Migration failed:', err);
+   
     process.exit(1);
   });

@@ -1,18 +1,46 @@
+const express = require("express");
+const router = express.Router();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const db = require("../../database/database/connection"); // adjust path
+const authMiddleware = require("../middleware/authMiddleware");
 
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const secret = process.env.JWT_SECRET || 'dev_secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
 
-module.exports = function (req, res, next) {
-  const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ message: 'No token provided' });
-  const token = auth.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Invalid token format' });
-  try {
-    const payload = jwt.verify(token, secret);
-    req.user = payload;
-    next();
-  } catch (e) {
-    return res.status(401).json({ message: 'Invalid or expired token' });
-  }
-};
+// LOGIN (works for both admin and user)
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await db.getUserByEmail(email); // adjust to your DB method
+        if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+        // Create JWT token
+        const token = jwt.sign(
+            { id: user.id, role: user.role },
+            JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.json({ token, role: user.role });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// PROTECTED ROUTE (Admin only)
+router.get("/admin-data", authMiddleware("admin"), (req, res) => {
+    res.json({ message: "Welcome, Admin!" });
+});
+
+// PROTECTED ROUTE (User only)
+router.get("/user-data", authMiddleware("user"), (req, res) => {
+    res.json({ message: "Welcome, User!" });
+});
+
+module.exports = router;
+
