@@ -1,23 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getApplicationsForJob, updateApplicationStatus, fetchJob } from '../store/slices/applicationsSlice';
+import { getApplicationsForJob, updateApplicationStatus, fetchJob,fetchCoverLetter } from '../store/slices/applicationsSlice';
+import { FiFileText, FiExternalLink } from 'react-icons/fi';
+import { FILES_BASE_URL } from '../services/api'; // import the constant
 
 export default function AdminApplications() {
   const { jobId } = useParams();
   const dispatch = useDispatch();
   const apps = useSelector(s => s.applications.list);
-  const [job, setJob] = useState(null); // store job info
+  const [job, setJob] = useState(null);
+
+  const viewPDF = async (filename) => {
+    const resultAction = await dispatch(fetchCoverLetter(filename));
+    if (fetchCoverLetter.fulfilled.match(resultAction)) {
+      const url = resultAction.payload;
+      window.open(url); // open the PDF in a new tab
+    } else {
+      console.error('Failed to fetch PDF', resultAction.payload);
+    }
+  };
 
   useEffect(() => {
     if (jobId) {
       dispatch(getApplicationsForJob(jobId))
         .unwrap()
-        .then((data) => console.log('Applications:', data));
+        .then(data => console.log('Applications:', data));
 
       dispatch(fetchJob(jobId))
         .unwrap()
-        .then((data) => setJob(data))
+        .then(data => setJob(data))
         .catch(err => console.error('Failed to fetch job:', err));
     }
   }, [dispatch, jobId]);
@@ -34,7 +46,7 @@ export default function AdminApplications() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4">
       {job ? (
         <h2 className="text-2xl font-bold mb-4">
           Applications for: {job.title} (ID: {job.id})
@@ -46,39 +58,75 @@ export default function AdminApplications() {
       {apps.length === 0 ? (
         <p className="text-gray-500">No applications yet.</p>
       ) : (
-        <ul className="space-y-4">
-          {apps.map(a => (
-            <li key={a.id} className="p-4 border rounded shadow hover:shadow-md transition">
-              <div className="flex justify-between items-center mb-2">
-                <div className="font-semibold text-lg">{a.applicantEmail}</div>
-                <span className={`px-2 py-1 rounded text-sm font-medium ${statusColor(a.status)}`}>
-                  {a.status.toUpperCase()}
-                </span>
-              </div>
-              <div className="text-gray-700 mb-3">{a.coverLetter}</div>
-              <div className="flex space-x-2">
-                <button
-                  className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded hover:bg-yellow-300"
-                  onClick={() => setStatus(a.id, 'reviewed')}
+        <table className="w-full border-collapse border">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-4 py-2 text-left">Applicant Email</th>
+              <th className="border px-4 py-2 text-left">Cover Letter</th>
+              <th className="border px-4 py-2 text-left">CV Link</th>
+              <th className="border px-4 py-2 text-left">Status</th>
+              <th className="border px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {apps.map(a => (
+              <tr key={a.id} className="hover:bg-gray-50">
+                <td className="border px-4 py-2">{a.applicantEmail}</td>
+                <td className="border px-4 py-2 flex items-center space-x-2">
+                  {a.coverLetter ? (
+                  <button
+                  onClick={() => viewPDF(a.coverLetter)}
+                  className="text-blue-600 hover:underline flex items-center"
                 >
-                  Mark Reviewed
+                  <FiFileText className="text-red-500 w-5 h-5" />
+                  View PDF
                 </button>
-                <button
-                  className="px-3 py-1 bg-green-200 text-green-800 rounded hover:bg-green-300"
-                  onClick={() => setStatus(a.id, 'accepted')}
-                >
-                  Accept
-                </button>
-                <button
-                  className="px-3 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
-                  onClick={() => setStatus(a.id, 'rejected')}
-                >
-                  Reject
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                
+                
+                 
+                  ) : (
+                    <span className="text-gray-500">No file</span>
+                  )}
+                </td>
+                <td className="border px-4 py-2">
+                  {a.cvLink ? (
+                    <a
+                      href={a.cvLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline flex items-center"
+                    >
+                      View CV <FiExternalLink className="ml-1 w-4 h-4"/>
+                    </a>
+                  ) : (
+                    <span className="text-gray-500">No link</span>
+                  )}
+                </td>
+                <td className={`border px-4 py-2 ${statusColor(a.status)} font-semibold`}>{a.status.toUpperCase()}</td>
+                <td className="border px-4 py-2 space-x-2">
+                  <button
+                    className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded hover:bg-yellow-300"
+                    onClick={() => setStatus(a.id, 'reviewed')}
+                  >
+                    Review
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-green-200 text-green-800 rounded hover:bg-green-300"
+                    onClick={() => setStatus(a.id, 'accepted')}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="px-3 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300"
+                    onClick={() => setStatus(a.id, 'rejected')}
+                  >
+                    Reject
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

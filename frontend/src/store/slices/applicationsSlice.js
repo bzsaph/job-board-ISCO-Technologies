@@ -13,7 +13,20 @@ export const applyJob = createAsyncThunk(
     }
   }
 );
-
+export const fetchCoverLetter = createAsyncThunk(
+  'applications/fetchCoverLetter',
+  async (filename, { rejectWithValue }) => {
+    try {
+      // fetch as blob
+      const res = await api.get(`/files/${filename}`, { responseType: 'blob' });
+      // convert to URL for browser
+      const url = window.URL.createObjectURL(res.data);
+      return url;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
 // Get all applications for a specific job (admin)
 export const getApplicationsForJob = createAsyncThunk(
   'applications/forJob',
