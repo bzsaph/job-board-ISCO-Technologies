@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { FILES_BASE_URL } from '../services/api'; // adjust path as needed
+
+
 import {
   getApplicationsForJob,
   updateApplicationStatus,
@@ -19,7 +22,7 @@ export default function AdminApplications() {
   // Open PDF in new tab
   const viewPDF = async (filename) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/files/${filename}`);
+      const res = await fetch(`${FILES_BASE_URL}/files/${filename}`);
 
       if (!res.ok) throw new Error('File not found');
 
