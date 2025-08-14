@@ -1,13 +1,21 @@
--- Users
+-- Drop existing tables if they exist (order matters because of foreign keys)
+DROP TABLE IF EXISTS applications;
+DROP TABLE IF EXISTS jobs;
+DROP TABLE IF EXISTS users;
+
+-- Users table (with updatedAt)
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
-  role TEXT CHECK(role IN ('admin','user')) NOT NULL
+  firstName TEXT NOT NULL,
+  lastName TEXT NOT NULL,
+  role TEXT CHECK(role IN ('admin','user')) NOT NULL,
+  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Jobs
+-- Jobs table
 CREATE TABLE IF NOT EXISTS jobs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
@@ -18,7 +26,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   FOREIGN KEY(created_by) REFERENCES users(id)
 );
 
--- Applications
+-- Applications table
 CREATE TABLE IF NOT EXISTS applications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   job_id INTEGER NOT NULL,
