@@ -91,19 +91,34 @@ function listByJob(req, res) {
 
 // Get applications of logged-in user
 async function getMyApplications(req, res) {
-  const userId = req.user.id; 
-  const db = open();
+  try {
+    const userId = req.user.id; 
+    const db = open();
 
-  db.all(
-    'SELECT * FROM applications WHERE userId = ?',
-    [userId],
-    (err, rows) => {
-      db.close();
-      if (err) return res.status(500).json({ message: 'DB error' });
-      res.json(rows);
-    }
-  );
+    const query = `
+      SELECT a.*, j.title AS jobTitle
+      FROM applications a
+      JOIN jobs j ON a.jobId = j.id
+      WHERE a.userId = ?
+    `;
+
+    db.all(query, [userId], (err, rows) => {
+      db.close(); // always close DB
+      if (err) {
+        console.error('DB error:', err);
+        return res.status(500).json({ message: 'DB error' });
+      }
+
+      // Ensure 200 response even if empty
+      return res.status(200).json(rows || []);
+    });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
 }
+
+
 
 // Update application status (admin)
 function updateStatus(req, res) {

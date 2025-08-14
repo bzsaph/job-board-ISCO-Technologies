@@ -12,10 +12,10 @@ export default function DashboardLayout({ children }) {
         <aside className="w-64 bg-white shadow-lg p-6 hidden md:block">
           <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
           <nav className="flex flex-col space-y-3">
-            <Link to="/dashboard">Home</Link>
+            <Link to="/">Home</Link>
             <Link to="/my-applications">My Applications</Link>
             <Link to="/profile">Profile</Link>
-            <Link to="/jobs">Jobs</Link>
+            <Link to="/">Jobs</Link>
             {auth.user?.role === 'admin' && <Link to="/admin/users">All Users</Link>}
           </nav>
         </aside>

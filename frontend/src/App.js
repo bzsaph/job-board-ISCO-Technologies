@@ -10,6 +10,7 @@ import AdminJobs from './pages/AdminJobs';
 import AdminApplications from './pages/AdminApplications';
 import ProtectedRoute from './components/ProtectedRoute';
 import Myapplication from './pages/Myapplication';
+import Profile from './pages/Profile';
 
 function Navbar() {
   const user = useSelector(state => state.auth);
@@ -107,7 +108,9 @@ export default function App() {
           <Route path="/admin" element={<ProtectedRoute adminOnly><AdminJobs /></ProtectedRoute>} />
           <Route path="/admin/applications/:jobId" element={<ProtectedRoute adminOnly><AdminApplications /></ProtectedRoute>} />
           <Route path="/my-applications" element={<ProtectedRoute><Myapplication /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
 
+         
 
 
         </Routes>

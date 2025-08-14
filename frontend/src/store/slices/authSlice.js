@@ -40,5 +40,27 @@ const slice = createSlice({
   }
 });
 
+
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (payload, { getState }) => {
+    const token = getState().auth.token;
+    const res = await api.put('/auth/profile', payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  }
+);
+const authSlice = createSlice({
+  name: 'auth',
+  initialState: { user: null, token: null },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+      state.user = action.payload;
+    });
+  },
+});
+
 export const { logout } = slice.actions;
 export default slice.reducer;

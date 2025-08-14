@@ -14,6 +14,20 @@ export const applyJob = createAsyncThunk(
   }
 );
 
+// / Fetch applications of the logged-in user
+export const fetchMyApplications = createAsyncThunk(
+  'applications/fetchMyApplications',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get('/applications/mine'); // backend endpoint
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
+
 // Fetch cover letter as Blob and convert to URL
 export const fetchCoverLetter = createAsyncThunk(
   'applications/fetchCoverLetter',
