@@ -106,7 +106,12 @@ cp .env.example .env
 
 4. Run database migrations:
 ```bash
+# Run migrations
 npm run migrate
+
+# Rollback (drop tables)
+npm run migrate:rollback
+
 ```
 
 5. Seed the database:
