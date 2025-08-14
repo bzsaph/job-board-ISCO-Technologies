@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
-// Apply for a job (coverLetter file + CV link via FormData)
+// Apply for a job (coverLetter file + CV link)
 export const applyJob = createAsyncThunk(
   'applications/apply',
   async (data, { rejectWithValue }) => {
@@ -13,13 +13,13 @@ export const applyJob = createAsyncThunk(
     }
   }
 );
+
+// Fetch cover letter as Blob and convert to URL
 export const fetchCoverLetter = createAsyncThunk(
   'applications/fetchCoverLetter',
   async (filename, { rejectWithValue }) => {
     try {
-      // fetch as blob
       const res = await api.get(`/files/${filename}`, { responseType: 'blob' });
-      // convert to URL for browser
       const url = window.URL.createObjectURL(res.data);
       return url;
     } catch (err) {
@@ -27,13 +27,13 @@ export const fetchCoverLetter = createAsyncThunk(
     }
   }
 );
+
 // Get all applications for a specific job (admin)
 export const getApplicationsForJob = createAsyncThunk(
   'applications/forJob',
   async (jobId, { rejectWithValue }) => {
     try {
       const res = await api.get(`/applications/job/${jobId}`);
-      console.log('Applications for job:', res.data);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -69,33 +69,42 @@ export const updateApplicationStatus = createAsyncThunk(
 
 const slice = createSlice({
   name: 'applications',
-  initialState: { list: [], last: null, status: 'idle', error: null },
-  reducers: {},
-  extraReducers: (b) => {
-    b.addCase(applyJob.fulfilled, (s, a) => { 
-      s.last = a.payload; 
-      s.error = null;
-    });
-    b.addCase(applyJob.rejected, (s, a) => { 
-      s.error = a.payload?.message || 'Failed to apply'; 
-    });
+  initialState: {
+    list: [],
+    last: null,
+    status: 'idle',
+    error: null
+  },
+  reducers: {
+    clearError: (state) => { state.error = null; }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(applyJob.fulfilled, (state, action) => {
+        state.last = action.payload;
+        state.error = null;
+      })
+      .addCase(applyJob.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to apply';
+      })
 
-    b.addCase(getApplicationsForJob.fulfilled, (s, a) => { 
-      s.list = a.payload; 
-      s.error = null;
-    });
-    b.addCase(getApplicationsForJob.rejected, (s, a) => { 
-      s.error = a.payload?.message || 'Failed to fetch applications'; 
-    });
+      .addCase(getApplicationsForJob.fulfilled, (state, action) => {
+        state.list = action.payload;
+        state.error = null;
+      })
+      .addCase(getApplicationsForJob.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to fetch applications';
+      })
 
-    b.addCase(updateApplicationStatus.fulfilled, (s, a) => { 
-      s.list = s.list.map(x => x.id === a.payload.id ? a.payload : x); 
-      s.error = null;
-    });
-    b.addCase(updateApplicationStatus.rejected, (s, a) => { 
-      s.error = a.payload?.message || 'Failed to update status'; 
-    });
+      .addCase(updateApplicationStatus.fulfilled, (state, action) => {
+        state.list = state.list.map(x => x.id === action.payload.id ? action.payload : x);
+        state.error = null;
+      })
+      .addCase(updateApplicationStatus.rejected, (state, action) => {
+        state.error = action.payload?.message || 'Failed to update status';
+      });
   }
 });
 
+export const { clearError } = slice.actions;
 export default slice.reducer;
