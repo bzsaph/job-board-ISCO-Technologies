@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getApplicationsForJob, updateApplicationStatus, fetchJob,fetchCoverLetter } from '../store/slices/applicationsSlice';
 import { FiFileText, FiExternalLink } from 'react-icons/fi';
 import { FILES_BASE_URL } from '../services/api'; // import the constant
+import DashboardLayout from '../components/DashboardLayout';
 
 export default function AdminApplications() {
   const { jobId } = useParams();
@@ -45,8 +46,9 @@ export default function AdminApplications() {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-4">
+ return (
+    <DashboardLayout>
+    <div className="max-w-12xl mx-auto p-12">
       {job ? (
         <h2 className="text-2xl font-bold mb-4">
           Applications for: {job.title} (ID: {job.id})
@@ -129,5 +131,6 @@ export default function AdminApplications() {
         </table>
       )}
     </div>
+    </DashboardLayout>
   );
 }

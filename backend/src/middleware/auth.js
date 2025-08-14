@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const db = require("../../database/database/connection"); // adjust path
+const db = require("../../database/migrations/database_connection"); // adjust path
 const authMiddleware = require("../middleware/authMiddleware");
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';

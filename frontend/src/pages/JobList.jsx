@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs } from '../store/slices/jobsSlice';
 import { Link } from 'react-router-dom';
+import DashboardLayout from '../components/DashboardLayout';
 
 export default function JobList() {
   const dispatch = useDispatch();
@@ -20,7 +21,8 @@ export default function JobList() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-6 px-4">
+    <DashboardLayout>
+    <div className="max-w-12xl mx-auto py-12 px-4">
       <h2 className="text-3xl font-bold text-gray-800 mb-6">Available Jobs</h2>
 
       {/* Search Filters */}
@@ -92,5 +94,6 @@ export default function JobList() {
         </table>
       </div>
     </div>
+    </DashboardLayout>
   );
 }

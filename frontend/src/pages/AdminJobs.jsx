@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, createJob, deleteJob } from '../store/slices/jobsSlice';
 import { Link } from 'react-router-dom';
+import DashboardLayout from '../components/DashboardLayout';
 
 export default function AdminJobs() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ export default function AdminJobs() {
   }
 
   return (
+    <DashboardLayout>
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -169,5 +171,6 @@ export default function AdminJobs() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 }
