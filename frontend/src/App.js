@@ -11,6 +11,7 @@ import AdminApplications from './pages/AdminApplications';
 import ProtectedRoute from './components/ProtectedRoute';
 import Myapplication from './pages/Myapplication';
 import Profile from './pages/Profile';
+import UsersList from './pages/UsersList';
 
 function Navbar() {
   const user = useSelector(state => state.auth.user); // ✅ correctly access only user
@@ -53,7 +54,10 @@ function Navbar() {
         {/* Menu */}
         <nav className="flex items-center space-x-4">
           <Link to="/" className="text-gray-700 hover:text-indigo-600">Jobs</Link>
-          <Link to="/admin" className="text-gray-700 hover:text-indigo-600">Admin</Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="text-gray-700 hover:text-indigo-600">Admin</Link>
+          )}
+
 
           {user ? (
             <>
@@ -104,6 +108,7 @@ export default function App() {
           <Route path="/admin/applications/:jobId" element={<ProtectedRoute adminOnly><AdminApplications /></ProtectedRoute>} />
           <Route path="/my-applications" element={<ProtectedRoute><Myapplication /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute adminOnly><UsersList/></ProtectedRoute>} /> 
         </Routes>
       </main>
     </BrowserRouter>
