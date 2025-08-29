@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 
 export default function Navbar() {
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user); // correctly selecting user
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ export default function Navbar() {
 
   return (
     <header className="bg-white shadow-md">
-  
+     
     </header>
   );
 }

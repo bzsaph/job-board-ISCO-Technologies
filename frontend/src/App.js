@@ -13,10 +13,9 @@ import Myapplication from './pages/Myapplication';
 import Profile from './pages/Profile';
 
 function Navbar() {
-  const user = useSelector(state => state.auth);
+  const user = useSelector(state => state.auth.user); // ✅ correctly access only user
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const handleLogout = () => {
     dispatch(logout());
@@ -33,30 +32,22 @@ function Navbar() {
             alt="Logo"
             className="h-8 w-8 object-contain"
           />
-          <span className="text-lg font-bold text-indigo-600">JobBoard 
-          {user ? (
-            <>
+          <span className="text-lg font-bold text-indigo-600">
+            JobBoard
+            {user && (
               <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              user.user?.role === 'admin'
-                ? 'text-red-600'
-                : user.user?.role === 'user'
-                ? 'text-green-600'
-                : 'text-gray-600'
-            }`}
-          >
-            ({user.user?.role})
+                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                  user.role === 'admin'
+                    ? 'text-red-600'
+                    : user.role === 'user'
+                    ? 'text-green-600'
+                    : 'text-gray-600'
+                }`}
+              >
+                ({user.role})
+              </span>
+            )}
           </span>
-
-            </>
-          ) : (
-            <>
-            
-            </>
-          )}
-            
-            
-             </span>
         </Link>
 
         {/* Menu */}
@@ -66,13 +57,17 @@ function Navbar() {
 
           {user ? (
             <>
-              <span className={`font-semibold ${user.user?.role === 'admin'
-                  ? 'text-red-600'
-                  : user.user?.role === 'user'
+              <span
+                className={`font-semibold ${
+                  user.role === 'admin'
+                    ? 'text-red-600'
+                    : user.role === 'user'
                     ? 'text-green-600'
-                    : 'text-gray-600'}`}>Hi, {user.user?.firstName} {user.user?.lastName}
+                    : 'text-gray-600'
+                }`}
+              >
+                Hi, {user.firstName} {user.lastName}
               </span>
-
 
               <button
                 onClick={handleLogout}
@@ -109,10 +104,6 @@ export default function App() {
           <Route path="/admin/applications/:jobId" element={<ProtectedRoute adminOnly><AdminApplications /></ProtectedRoute>} />
           <Route path="/my-applications" element={<ProtectedRoute><Myapplication /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
-
-         
-
-
         </Routes>
       </main>
     </BrowserRouter>
